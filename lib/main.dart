@@ -1,21 +1,36 @@
 import 'package:flutter/material.dart';
-import 'screens/home_shell.dart';
+import 'models/details_screen_args.dart';
 import 'screens/details_screen.dart';
-import 'screens/settings_screen.dart';
+import 'screens/home_shell.dart';
 import 'screens/login_screen.dart';
+import 'screens/settings_screen.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  void _toggleTheme(bool isDarkMode) {
+    setState(() {
+      _themeMode = isDarkMode ? ThemeMode.dark : ThemeMode.light;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Multi-Écrans Demo',
       debugShowCheckedModeBanner: false,
+      themeMode: _themeMode,
       theme: ThemeData(
         colorSchemeSeed: Colors.indigo,
         useMaterial3: true,
@@ -25,27 +40,38 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         useMaterial3: true,
       ),
-      // Route de démarrage
       initialRoute: '/',
-      // ---- Routes nommées (navigation "classique") ----
       routes: {
         '/': (context) => const LoginScreen(),
         '/home': (context) => const HomeShell(),
-        '/settings': (context) => const SettingsScreen(),
+        '/settings': (context) => SettingsScreen(
+              isDarkMode: _themeMode == ThemeMode.dark,
+              onThemeChanged: _toggleTheme,
+            ),
       },
-      // ---- Route dynamique avec arguments (onGenerateRoute) ----
       onGenerateRoute: (settings) {
         if (settings.name == '/details') {
-          final args = settings.arguments as Map<String, dynamic>? ?? {};
-          return MaterialPageRoute(
-            builder: (context) => DetailsScreen(
-              itemId: args['id'] ?? 0,
-              title: args['title'] ?? 'Détail',
-            ),
-            settings: settings,
-          );
+          final args = settings.arguments;
+          if (args is DetailsScreenArgs) {
+            return MaterialPageRoute(
+              builder: (context) => DetailsScreen(args: args),
+              settings: settings,
+            );
+          }
+
+          if (args is Map<String, dynamic>) {
+            return MaterialPageRoute(
+              builder: (context) => DetailsScreen(
+                args: DetailsScreenArgs(
+                  itemId: args['id'] as int? ?? 0,
+                  title: args['title'] as String? ?? 'Détail',
+                ),
+              ),
+              settings: settings,
+            );
+          }
         }
-        return null; // laisse Flutter gérer les routes inconnues (-> onUnknownRoute)
+        return null;
       },
       onUnknownRoute: (settings) => MaterialPageRoute(
         builder: (context) => const _NotFoundScreen(),

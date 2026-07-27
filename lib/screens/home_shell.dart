@@ -27,24 +27,48 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    final isWideScreen = MediaQuery.of(context).size.width >= 700;
+    const destinations = [
+      NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Accueil'),
+      NavigationDestination(icon: Icon(Icons.explore_outlined), selectedIcon: Icon(Icons.explore), label: 'Explorer'),
+      NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Profil'),
+    ];
+
     return Scaffold(
       appBar: AppBar(title: Text(_titles[_currentIndex])),
       drawer: const AppDrawer(),
-      // IndexedStack garde chaque onglet monté (scroll, formulaires, etc.
-      // ne sont pas perdus quand on change d'onglet).
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _tabs,
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (index) => setState(() => _currentIndex = index),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Accueil'),
-          NavigationDestination(icon: Icon(Icons.explore_outlined), selectedIcon: Icon(Icons.explore), label: 'Explorer'),
-          NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Profil'),
-        ],
-      ),
+      body: isWideScreen
+          ? Row(
+              children: [
+                NavigationRail(
+                  selectedIndex: _currentIndex,
+                  onDestinationSelected: (index) => setState(() => _currentIndex = index),
+                  labelType: NavigationRailLabelType.selected,
+                  destinations: const [
+                    NavigationRailDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: Text('Accueil')),
+                    NavigationRailDestination(icon: Icon(Icons.explore_outlined), selectedIcon: Icon(Icons.explore), label: Text('Explorer')),
+                    NavigationRailDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: Text('Profil')),
+                  ],
+                ),
+                Expanded(
+                  child: IndexedStack(
+                    index: _currentIndex,
+                    children: _tabs,
+                  ),
+                ),
+              ],
+            )
+          : IndexedStack(
+              index: _currentIndex,
+              children: _tabs,
+            ),
+      bottomNavigationBar: isWideScreen
+          ? null
+          : NavigationBar(
+              selectedIndex: _currentIndex,
+              onDestinationSelected: (index) => setState(() => _currentIndex = index),
+              destinations: destinations,
+            ),
     );
   }
 }
