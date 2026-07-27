@@ -3,6 +3,7 @@ import 'models/details_screen_args.dart';
 import 'screens/details_screen.dart';
 import 'screens/home_shell.dart';
 import 'screens/login_screen.dart';
+import 'screens/profile_form_screen.dart';
 import 'screens/settings_screen.dart';
 
 void main() {
@@ -48,6 +49,7 @@ class _MyAppState extends State<MyApp> {
               isDarkMode: _themeMode == ThemeMode.dark,
               onThemeChanged: _toggleTheme,
             ),
+        '/profile-form': (context) => const ProfileFormScreen(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/details') {

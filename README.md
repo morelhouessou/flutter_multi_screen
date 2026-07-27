@@ -1,22 +1,29 @@
 # Flutter Multi-Écrans — Démo de navigation
 
-Petite application Flutter illustrant les principales techniques de navigation.
+Petite application Flutter illustrant les principales techniques de navigation, de gestion des données et de responsive design.
 
 ## Structure
 
 ```
 lib/
-├── main.dart                  # MaterialApp, routes nommées + onGenerateRoute
+├── main.dart                      # MaterialApp, routes nommées + onGenerateRoute
+├── data/
+│   └── item_repository.dart       # données séparées du UI + filtre/recherche
+├── models/
+│   ├── item.dart                  # modèle métier pour les éléments
+│   └── details_screen_args.dart   # arguments typés pour DetailsScreen
 ├── screens/
-│   ├── login_screen.dart      # pushReplacementNamed
-│   ├── home_shell.dart        # BottomNavigationBar + IndexedStack + Drawer
-│   ├── home_tab.dart          # push avec arguments + valeur de retour (await)
-│   ├── explore_tab.dart       # liste -> détail
-│   ├── profile_tab.dart       # onglet simple
-│   ├── details_screen.dart    # reçoit des arguments, fait un pop(valeur)
-│   └── settings_screen.dart   # accessible via le Drawer
+│   ├── login_screen.dart          # formulaire de connexion validé
+│   ├── home_shell.dart            # onglets + responsive NavigationRail
+│   ├── home_tab.dart              # navigation push/await + résultats
+│   ├── explore_tab.dart           # liste avec recherche et filtre
+│   ├── profile_tab.dart           # profil utilisateur + navigation vers formulaire
+│   ├── profile_form_screen.dart   # formulaire profil 3 champs + validation
+│   ├── details_screen.dart        # écran de détail avec retour de valeur
+│   ├── settings_screen.dart       # paramètres + thème sombre activable
+│   └── login_screen.dart          # écran de connexion
 └── widgets/
-    └── app_drawer.dart        # menu latéral + pushNamedAndRemoveUntil (déconnexion)
+    └── app_drawer.dart            # drawer avec déconnexion et navigation
 ```
 
 ## Techniques de navigation couvertes
@@ -45,7 +52,10 @@ flutter run
 
 ## Flux de l'app
 
-1. **Login** → validation d'un formulaire → `pushReplacementNamed('/home')`
-2. **Home** (Accueil / Explorer / Profil via onglets bas) → tap sur un item → `Details`
-3. **Details** → `pop(valeur)` renvoyé à l'écran appelant, ou accessible aussi via `/details` directement
-4. **Drawer** (accessible depuis n'importe quel onglet) → `Settings` ou déconnexion vers `Login`
+1. **Login** → validation d'un formulaire utilisateur centralisé (nom, e-mail, mot de passe, confirmation) → `pushReplacementNamed('/home')`
+2. **Home** (Accueil / Explorer / Profil via onglets bas) → sélection d'un item ou navigation interne
+3. **Explore** → liste de données séparées dans `ItemRepository`, recherche textuelle et filtre sur les éléments pairs
+4. **Details** → écran dynamique créé via `onGenerateRoute` et `DetailsScreenArgs`, avec retour d'une valeur à l'écran précédent
+5. **Profil** → navigation vers `ProfileFormScreen`, formulaire de 3 champs validé
+6. **Paramètres** → option de thème sombre activable et interface de configuration
+7. **Drawer** → navigation transversale + déconnexion avec `pushNamedAndRemoveUntil`
